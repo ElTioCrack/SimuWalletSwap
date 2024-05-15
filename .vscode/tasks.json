@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Start Backend",
+      "label": "Start Backend Wallet",
       "type": "shell",
       "command": "npm",
       "args": ["run", "start:dev"],
@@ -16,7 +16,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Start Frontend",
+      "label": "Start Frontend Wallet",
       "type": "shell",
       "command": "npm",
       "args": ["run", "dev"],
