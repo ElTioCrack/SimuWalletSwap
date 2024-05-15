@@ -29,11 +29,5 @@
       },
       "problemMatcher": []
     },
-    {
-      "label": "Execute Wallet",
-      "dependsOrder": "sequence",
-      "dependsOn": ["Start Backend", "Start Frontend"],
-      "problemMatcher": []
-    }
   ]
 }
