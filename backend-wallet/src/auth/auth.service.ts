@@ -95,13 +95,19 @@ export class AuthService {
   async verifyAccessToken(token: string): Promise<ApiResponse<boolean>> {
     try {
       const isValid = await JwtUtils.verifyAccessToken(token);
+      const message = isValid
+        ? 'Access token verified'
+        : 'Access token verification failed';
+      const statusCode = isValid ? HttpStatus.OK : HttpStatus.UNAUTHORIZED;
+
       return {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Access token verified',
+        statusCode,
+        success: !!isValid,
+        message,
         data: isValid,
       };
     } catch (error) {
+      console.error('Error verifying access token:', error);
       return {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         success: false,
@@ -114,13 +120,19 @@ export class AuthService {
   async verifyRefreshToken(token: string): Promise<ApiResponse<boolean>> {
     try {
       const isValid = await JwtUtils.verifyRefreshToken(token);
+      const message = isValid
+        ? 'Refresh token verified'
+        : 'Refresh token verification failed';
+      const statusCode = isValid ? HttpStatus.OK : HttpStatus.UNAUTHORIZED;
+
       return {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Refresh token verified',
+        statusCode,
+        success: !!isValid,
+        message,
         data: isValid,
       };
     } catch (error) {
+      console.error('Error verifying refresh token:', error);
       return {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         success: false,
@@ -132,7 +144,7 @@ export class AuthService {
 
   async generateAccessTokenFromRefreshToken(
     refreshToken: string,
-  ): Promise<ApiResponse<string | null>> {
+  ): Promise<ApiResponse<any>> {
     try {
       const accessToken =
         await JwtUtils.generateAccessTokenFromRefreshToken(refreshToken);
@@ -147,9 +159,10 @@ export class AuthService {
         statusCode,
         success: !!accessToken,
         message,
-        data: accessToken,
+        data: { accessToken }, // Simplificado a { accessToken }
       };
     } catch (error) {
+      console.error('Error generating access token from refresh token:', error);
       return {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         success: false,

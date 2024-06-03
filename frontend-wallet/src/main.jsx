@@ -18,8 +18,9 @@ import "./index.css";
 
 import Example from "./pages/Example";
 import Component from "./pages/component";
+import TransactionsPage from "./pages/TransactionsPage";
 
-const route = createBrowserRouter([
+const router = createBrowserRouter([
   {
     path: "/example",
     element: <Example />,
@@ -50,22 +51,24 @@ const route = createBrowserRouter([
   },
   {
     path: "/wallet",
-    element: <ProtectedRoute />,
+    // element: <ProtectedRoute />,
     children: [
       {
         path: "/wallet",
         element: <WalletPage />,
+      },
+      {
+        path: "/wallet/transactions",
+        element: <TransactionsPage />,
       },
     ],
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <>
-    <React.StrictMode>
-      <AuthProvider>
-        <RouterProvider router={route} />
-      </AuthProvider>
-    </React.StrictMode>
-  </>
+  <React.StrictMode>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  </React.StrictMode>
 );

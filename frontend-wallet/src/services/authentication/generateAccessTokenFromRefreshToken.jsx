@@ -6,7 +6,7 @@ const generateAccessTokenFromRefreshToken = async (refreshToken) => {
   const endpointUrl = "auth/generate-access-token";
   try {
     const response = await axios.post(`${BaseUrl}/${endpointUrl}`, null, {
-      headers: { Authorization: refreshToken }
+      headers: { Authorization: refreshToken },
     });
 
     const { status, data } = response;

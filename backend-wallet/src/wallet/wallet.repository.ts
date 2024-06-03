@@ -2,8 +2,8 @@ import { Injectable, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Wallet } from './../schemas/wallet.schema';
-import ApiResponse from './../interfaces/api-response.interface';
 import { CreateWalletDto } from './dto/wallet.dto';
+import ApiResponse from './../interfaces/api-response.interface';
 
 @Injectable()
 export class WalletRepository {

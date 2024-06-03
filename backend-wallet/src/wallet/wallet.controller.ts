@@ -11,17 +11,17 @@ import {
 
 import { WalletService } from './wallet.service';
 import { Wallet } from './../schemas/wallet.schema';
-import HttpsStatus from './../enums/http-status.enum';
-
-import ApiResponse from './../interfaces/api-response.interface';
 import { CreateWalletDto } from './dto/wallet.dto';
+import ApiResponse from './../interfaces/api-response.interface';
 
 @Controller('wallet')
 export class WalletController {
   constructor(private readonly walletService: WalletService) {}
 
   @Post()
-  async createWallet(@Body() walletData: CreateWalletDto): Promise<ApiResponse<any>> {
+  async createWallet(
+    @Body() walletData: CreateWalletDto,
+  ): Promise<ApiResponse<any>> {
     try {
       const wallet = await this.walletService.create(walletData);
       return wallet;
@@ -54,14 +54,6 @@ export class WalletController {
   async getWalletById(@Param('id') id: string): Promise<ApiResponse<any>> {
     try {
       const wallet = await this.walletService.findOneById(id);
-      if (!wallet) {
-        return {
-          statusCode: HttpStatus.NOT_FOUND,
-          success: false,
-          message: 'Wallet not found',
-          data: null,
-        };
-      }
       return wallet;
     } catch (error) {
       return {
@@ -79,14 +71,6 @@ export class WalletController {
   ): Promise<ApiResponse<any>> {
     try {
       const wallet = await this.walletService.findOneByPublicKey(publicKey);
-      if (!wallet) {
-        return {
-          statusCode: HttpStatus.NOT_FOUND,
-          success: false,
-          message: 'Wallet not found',
-          data: null,
-        };
-      }
       return wallet;
     } catch (error) {
       return {
@@ -105,14 +89,6 @@ export class WalletController {
   ): Promise<ApiResponse<any>> {
     try {
       const wallet = await this.walletService.update(id, updateData);
-      if (!wallet) {
-        return {
-          statusCode: HttpStatus.NOT_FOUND,
-          success: false,
-          message: 'Wallet not found',
-          data: null,
-        };
-      }
       return wallet;
     } catch (error) {
       return {
@@ -128,14 +104,6 @@ export class WalletController {
   async deleteWallet(@Param('id') id: string): Promise<ApiResponse<any>> {
     try {
       const wallet = await this.walletService.delete(id);
-      if (!wallet) {
-        return {
-          statusCode: HttpStatus.NOT_FOUND,
-          success: false,
-          message: 'Wallet not found',
-          data: null,
-        };
-      }
       return wallet;
     } catch (error) {
       return {

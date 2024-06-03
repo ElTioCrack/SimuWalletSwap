@@ -12,6 +12,6 @@ import { Wallet, WalletSchema } from './../schemas/wallet.schema';
   ],
   controllers: [WalletController],
   providers: [WalletService, WalletRepository],
-  exports: [WalletService, WalletRepository], // Asegúrate de exportar WalletRepository
+  exports: [WalletService, WalletRepository],
 })
 export class WalletModule {}

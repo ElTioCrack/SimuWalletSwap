@@ -1,8 +1,8 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
 import { WalletRepository } from './wallet.repository';
 import { Wallet } from './../schemas/wallet.schema';
-import ApiResponse from './../interfaces/api-response.interface';
 import { CreateWalletDto } from './dto/wallet.dto';
+import ApiResponse from './../interfaces/api-response.interface';
 
 @Injectable()
 export class WalletService {
@@ -18,7 +18,7 @@ export class WalletService {
           statusCode: HttpStatus.BAD_REQUEST,
           success: false,
           message: 'A wallet with the same public key already exists',
-          data: 'service',
+          data: null,
         };
       }
 
@@ -28,19 +28,14 @@ export class WalletService {
         password: walletData.password,
       });
 
-      return {
-        statusCode: HttpStatus.CREATED,
-        success: true,
-        message: 'Wallet created successfully',
-        data: createdWallet.data,
-      };
+      return createdWallet;
     } catch (error) {
       console.error('Error creating wallet:', error);
       return {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         success: false,
         message: 'Failed to create wallet',
-        data: 'service: ' + error.message,
+        data: error.message,
       };
     }
   }
@@ -48,12 +43,7 @@ export class WalletService {
   async findAll(): Promise<ApiResponse<any>> {
     try {
       const wallets = await this.walletRepository.findAll();
-      return {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Wallets retrieved successfully',
-        data: wallets.data,
-      };
+      return wallets;
     } catch (error) {
       return {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -67,20 +57,7 @@ export class WalletService {
   async findOneById(id: string): Promise<ApiResponse<any>> {
     try {
       const wallet = await this.walletRepository.findOneById(id);
-      if (!wallet || !wallet.data) {
-        return {
-          statusCode: HttpStatus.NOT_FOUND,
-          success: false,
-          message: 'Wallet not found for ID: ' + id,
-          data: null,
-        };
-      }
-      return {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Wallet retrieved successfully',
-        data: wallet.data,
-      };
+      return wallet;
     } catch (error) {
       return {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -94,20 +71,7 @@ export class WalletService {
   async findOneByPublicKey(publicKey: string): Promise<ApiResponse<any>> {
     try {
       const wallet = await this.walletRepository.findOneByPublicKey(publicKey);
-      if (!wallet || !wallet.data) {
-        return {
-          statusCode: HttpStatus.NOT_FOUND,
-          success: false,
-          message: 'Wallet not found for public key: ' + publicKey,
-          data: null,
-        };
-      }
-      return {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Wallet retrieved successfully',
-        data: wallet.data,
-      };
+      return wallet;
     } catch (error) {
       return {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -124,20 +88,7 @@ export class WalletService {
   ): Promise<ApiResponse<any>> {
     try {
       const updatedWallet = await this.walletRepository.update(id, updateData);
-      if (!updatedWallet || !updatedWallet.data) {
-        return {
-          statusCode: HttpStatus.NOT_FOUND,
-          success: false,
-          message: 'Wallet not found for ID: ' + id,
-          data: null,
-        };
-      }
-      return {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Wallet updated successfully',
-        data: updatedWallet.data,
-      };
+      return updatedWallet;
     } catch (error) {
       return {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -151,20 +102,7 @@ export class WalletService {
   async delete(id: string): Promise<ApiResponse<any>> {
     try {
       const deletedWallet = await this.walletRepository.delete(id);
-      if (!deletedWallet || !deletedWallet.data) {
-        return {
-          statusCode: HttpStatus.NOT_FOUND,
-          success: false,
-          message: 'Wallet not found for ID: ' + id,
-          data: null,
-        };
-      }
-      return {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Wallet deleted successfully',
-        data: deletedWallet.data,
-      };
+      return deletedWallet
     } catch (error) {
       return {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,

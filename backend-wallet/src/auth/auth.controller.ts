@@ -77,12 +77,7 @@ export class AuthController {
   ): Promise<ApiResponse<any>> {
     try {
       const isValid = await this.authService.verifyAccessToken(token);
-      return {
-        statusCode: isValid.statusCode,
-        success: isValid.success,
-        message: isValid.message,
-        data: isValid.data,
-      };
+      return isValid;
     } catch (error) {
       return {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -99,12 +94,7 @@ export class AuthController {
   ): Promise<ApiResponse<any>> {
     try {
       const isValid = await this.authService.verifyRefreshToken(token);
-      return {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Refresh token verified',
-        data: isValid,
-      };
+      return isValid;
     } catch (error) {
       return {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -124,19 +114,7 @@ export class AuthController {
         await this.authService.generateAccessTokenFromRefreshToken(
           refreshToken,
         );
-      const message = accessToken
-        ? 'Access token generated from refresh token'
-        : 'Failed to generate access token from refresh token';
-      const statusCode = accessToken
-        ? HttpStatus.OK
-        : HttpStatus.INTERNAL_SERVER_ERROR;
-
-      return {
-        statusCode,
-        success: !!accessToken,
-        message,
-        data: accessToken,
-      };
+      return accessToken;
     } catch (error) {
       return {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,

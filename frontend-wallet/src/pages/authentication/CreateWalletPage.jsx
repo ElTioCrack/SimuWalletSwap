@@ -427,6 +427,15 @@ function CreateWalletPage() {
           Access it here
         </Link>
       </div>
+      
+      <div className="select-none">
+        <Link
+          to="/"
+          className="underline font-bold text-indigo-500 hover:text-indigo-800"
+        >
+          Back to Home
+        </Link>
+      </div>
     </main>
   );
 }

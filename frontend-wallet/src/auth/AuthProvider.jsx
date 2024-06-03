@@ -69,18 +69,17 @@ const AuthProvider = ({ children }) => {
       const refreshToken = localStorage.getItem("refreshToken");
 
       if (accessToken && refreshToken) {
-        const accessTokenExpired = await verifyAccessToken(accessToken);
-        console.log(`accessTokenExpire: ${accessTokenExpired}`)
-        if (accessTokenExpired) {
+        const isValidAccessToken = await verifyAccessToken(accessToken);
+
+        if (!isValidAccessToken.success) {
           const newAccessToken = await generateAccessTokenFromRefreshToken(
             refreshToken
           );
-          console.log(`newAccessToken: ${newAccessToken}`)
-          if (newAccessToken) {
-            console.log(`newAccessToken: ${newAccessToken}`)
+
+          if (newAccessToken.success) {
             const refreshTokenValid = await verifyRefreshToken(refreshToken);
             if (refreshTokenValid) {
-              login(newAccessToken, refreshToken);
+              login(newAccessToken.data.accessToken, refreshToken);
             } else {
               logout();
             }
@@ -97,7 +96,7 @@ const AuthProvider = ({ children }) => {
       console.error("Error checking authentication:", error);
       logout();
     } finally {
-      setIsLoading(false); // Indica que la verificación ha terminado
+      setIsLoading(false);
     }
   };
 

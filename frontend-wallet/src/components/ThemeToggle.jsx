@@ -21,13 +21,22 @@ function ThemeToggle() {
 
   return (
     <div className="lg:flex lg:justify-center">
-      <button className="focus:outline-none" onClick={toggleTheme}>
-        <div className="relative w-10 h-5 bg-gray-300 dark:bg-gray-800 rounded-full">
-          <div
-            className={`absolute left-0 top-0 w-5 h-5 bg-white dark:bg-gray-500 rounded-full transform transition-transform ${
-              theme === "dark" ? "translate-x-full" : "translate-x-0"
-            }`}
-          ></div>
+      <button
+        className="relative w-16 h-8 focus:outline-none bg-gray-300 dark:bg-gray-800 rounded-full transition-colors duration-300"
+        onClick={toggleTheme}
+      >
+        <div
+          className={`absolute top-1 left-1 w-6 h-6 bg-white dark:bg-gray-500 rounded-full shadow-md transform transition-transform duration-300 ${
+            theme === "dark" ? "translate-x-8" : "translate-x-0"
+          }`}
+        ></div>
+        <div
+          className={`absolute top-0 left-0 w-full h-full flex items-center justify-between px-2 text-sm font-medium ${
+            theme === "dark" ? "text-gray-300" : "text-gray-600"
+          }`}
+        >
+          <span>☀️</span>
+          <span>🌙</span>
         </div>
       </button>
     </div>
