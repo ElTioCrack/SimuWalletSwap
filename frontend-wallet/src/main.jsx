@@ -51,7 +51,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/wallet",
-    // element: <ProtectedRoute />,
+    element: <ProtectedRoute />,
     children: [
       {
         path: "/wallet",

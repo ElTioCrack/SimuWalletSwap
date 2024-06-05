@@ -3,8 +3,8 @@ import { Document } from 'mongoose';
 import { Transaction, TransactionSchema } from './transaction.schema';
 import { CryptoHolding, CryptoHoldingSchema } from './crypto-holding.schema';
 
-// @Schema({ collection: 'wallets', timestamps: true })
-@Schema({ timestamps: false })
+@Schema({ collection: 'wallets', timestamps: true })
+// @Schema({ timestamps: false })
 export class Wallet extends Document {
   @Prop({ required: true })
   createdAt: string;
