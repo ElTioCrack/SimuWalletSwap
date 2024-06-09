@@ -11,6 +11,12 @@ export class WalletRepository {
     @InjectModel(Wallet.name) private readonly walletModel: Model<Wallet>,
   ) {}
 
+  async startTransaction() {
+    const session = await this.walletModel.db.startSession();
+    session.startTransaction();
+    return session;
+  }
+
   async create(walletData: CreateWalletDto): Promise<ApiResponse<any>> {
     try {
       const createdWallet = new this.walletModel({
@@ -18,7 +24,7 @@ export class WalletRepository {
         publicKey: walletData.publicKey,
         password: walletData.password,
         createdAt: new Date().toISOString(),
-        cryptoHoldings: [],
+        cryptoHoldings: [{ token: 'SOL', amount: 0 }],
         transactions: [],
       });
 
@@ -110,6 +116,10 @@ export class WalletRepository {
         data: 'repository: ' + error.message,
       };
     }
+  }
+
+  async findOneByMnemonic(mnemonic: string): Promise<Wallet | null> {
+    return this.walletModel.findOne({ mnemonic }).exec();
   }
 
   async update(

@@ -1,13 +1,29 @@
-// src/crypto/crypto.controller.ts
 import { Controller, Post, Body, Param, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiResponse as SwaggerApiResponse, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { CryptoService } from './crypto.service';
 import ApiResponse from './../interfaces/api-response.interface';
 
+@ApiTags('crypto')
 @Controller('crypto')
 export class CryptoController {
   constructor(private readonly cryptoService: CryptoService) {}
 
   @Post(':id/holding')
+  @ApiOperation({ summary: 'Add a new crypto holding to a wallet' })
+  @SwaggerApiResponse({
+    status: 201,
+    description: 'Crypto holding added successfully.',
+  })
+  @SwaggerApiResponse({ status: 400, description: 'Bad Request.' })
+  @SwaggerApiResponse({ status: 500, description: 'Internal Server Error.' })
+  @ApiBody({ schema: { 
+      type: 'object', 
+      properties: { 
+        token: { type: 'string' }, 
+        amount: { type: 'number' }
+      } 
+    } 
+  })
   async addCryptoHolding(
     @Param('id') id: string,
     @Body('token') token: string,
@@ -27,6 +43,24 @@ export class CryptoController {
   }
 
   @Post(':id/transaction')
+  @ApiOperation({ summary: 'Add a new transaction to a wallet' })
+  @SwaggerApiResponse({
+    status: 201,
+    description: 'Transaction added successfully.',
+  })
+  @SwaggerApiResponse({ status: 400, description: 'Bad Request.' })
+  @SwaggerApiResponse({ status: 500, description: 'Internal Server Error.' })
+  @ApiBody({ schema: { 
+      type: 'object', 
+      properties: { 
+        type: { type: 'string' }, 
+        token: { type: 'string' }, 
+        amount: { type: 'number' },
+        address: { type: 'string' },
+        timestamp: { type: 'string' }
+      } 
+    } 
+  })
   async addTransaction(
     @Param('id') id: string,
     @Body('type') type: string,

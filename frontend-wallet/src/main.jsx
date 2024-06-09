@@ -21,14 +21,14 @@ import Component from "./pages/component";
 import TransactionsPage from "./pages/TransactionsPage";
 
 const router = createBrowserRouter([
-  {
-    path: "/example",
-    element: <Example />,
-  },
-  {
-    path: "/component",
-    element: <Component />,
-  },
+  // {
+  //   path: "/example",
+  //   element: <Example />,
+  // },
+  // {
+  //   path: "/component",
+  //   element: <Component />,
+  // },
   {
     path: "/helloworld",
     element: <HelloWorldPage />,

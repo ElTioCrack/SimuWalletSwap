@@ -1,13 +1,29 @@
-import { Controller, Headers, Post, Body, HttpStatus } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import ApiResponse from './../interfaces/api-response.interface';
+import {
+  Controller,
+  Headers,
+  Post,
+  Body,
+  HttpStatus,
+} from '@nestjs/common';
+import { ApiTags, ApiResponse as SwaggerApiResponse, ApiOperation } from '@nestjs/swagger';
+import ApiResponse from 'src/interfaces/api-response.interface';
 import { CreateWalletDto } from 'src/wallet/dto/wallet.dto';
+import { LoginWalletDto } from './dto'
+import { AuthService } from './auth.service';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('create-wallet')
+  @ApiOperation({ summary: 'Create a new wallet' })
+  @SwaggerApiResponse({
+    status: 201,
+    description: 'Wallet created successfully.',
+  })
+  @SwaggerApiResponse({ status: 400, description: 'Bad Request.' })
+  @SwaggerApiResponse({ status: 500, description: 'Internal Server Error.' })
   async createWallet(
     @Body() walletData: CreateWalletDto,
   ): Promise<ApiResponse<any>> {
@@ -44,23 +60,20 @@ export class AuthController {
   }
 
   @Post('access-wallet')
-  async accessWallet(@Body() credentials: any): Promise<ApiResponse<any>> {
+  @ApiOperation({ summary: 'Access a wallet' })
+  @SwaggerApiResponse({
+    status: 200,
+    description: 'Wallet accessed successfully.',
+  })
+  @SwaggerApiResponse({ status: 401, description: 'Invalid credentials.' })
+  @SwaggerApiResponse({ status: 500, description: 'Internal Server Error.' })
+  async accessWallet(@Body() credentials: LoginWalletDto): Promise<ApiResponse<any>> {
     try {
-      const tokens = await this.authService.login(credentials);
-      if (!tokens) {
-        return {
-          statusCode: HttpStatus.UNAUTHORIZED,
-          success: false,
-          message: 'Invalid credentials',
-          data: null,
-        };
+      const tokens = await this.authService.loginWithMnemonic(credentials);
+      if (!tokens.success) {
+        return tokens;
       }
-      return {
-        statusCode: HttpStatus.OK,
-        success: true,
-        message: 'Credentials are correct',
-        data: tokens,
-      };
+      return tokens;
     } catch (error) {
       return {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -72,6 +85,12 @@ export class AuthController {
   }
 
   @Post('verify-access-token')
+  @ApiOperation({ summary: 'Verify access token' })
+  @SwaggerApiResponse({
+    status: 200,
+    description: 'Access token verified successfully.',
+  })
+  @SwaggerApiResponse({ status: 500, description: 'Internal Server Error.' })
   async verifyAccessToken(
     @Headers('Authorization') token: string,
   ): Promise<ApiResponse<any>> {
@@ -89,6 +108,12 @@ export class AuthController {
   }
 
   @Post('verify-refresh-token')
+  @ApiOperation({ summary: 'Verify refresh token' })
+  @SwaggerApiResponse({
+    status: 200,
+    description: 'Refresh token verified successfully.',
+  })
+  @SwaggerApiResponse({ status: 500, description: 'Internal Server Error.' })
   async verifyRefreshToken(
     @Headers('Authorization') token: string,
   ): Promise<ApiResponse<any>> {
@@ -106,6 +131,12 @@ export class AuthController {
   }
 
   @Post('generate-access-token')
+  @ApiOperation({ summary: 'Generate access token from refresh token' })
+  @SwaggerApiResponse({
+    status: 200,
+    description: 'Access token generated successfully.',
+  })
+  @SwaggerApiResponse({ status: 500, description: 'Internal Server Error.' })
   async generateAccessTokenFromRefreshToken(
     @Headers('Authorization') refreshToken: string,
   ): Promise<ApiResponse<any>> {

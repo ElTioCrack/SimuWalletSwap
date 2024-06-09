@@ -1,23 +1,29 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import PasswordInput from "../../components/inputs/PasswordInput";
 
 import { useAuth } from "../../auth/AuthProvider";
 
-import { decryptData, generateSecretKey } from "../../utils/cryptoUtils.jsx";
+import { encryptData, generateSecretKey, hashPassword } from "../../utils/cryptoUtils.jsx";
 
 import { AccessWalletService } from "../../services/WalletServices.jsx";
 
 function AccessWalletPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isLoggedIn } = useAuth();
 
   const [step, setStep] = useState(1);
   const totalWords = 12;
   const [recoveryPhrase, setRecoveryPhrase] = useState(Array(totalWords).fill(""));
   const passwordRef = useRef(null);
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/wallet");
+    }
+  }, [isLoggedIn, navigate]);
 
   const handlePaste = () => {
     navigator.clipboard.readText().then((text) => {
@@ -45,16 +51,6 @@ function AccessWalletPage() {
     }
   };
 
-  const downloadRecoveryPhrase = () => {
-    const phraseToDownload = recoveryPhrase.join(" ");
-    const element = document.createElement("a");
-    const file = new Blob([phraseToDownload], { type: "text/plain" });
-    element.href = URL.createObjectURL(file);
-    element.download = "recovery_phrase.txt";
-    document.body.appendChild(element);
-    element.click();
-  };
-
   const uploadRecoveryPhrase = (event) => {
     const file = event.target.files[0];
     const reader = new FileReader();
@@ -75,9 +71,15 @@ function AccessWalletPage() {
       const mnemonic = recoveryPhrase.join(" ");
       const password = passwordRef.current.getValue();
       const secretKey = generateSecretKey(password);
-      const decryptedMnemonic = await decryptData(mnemonic, secretKey);
+      
+      const encryptedMnemonic = await encryptData(mnemonic, secretKey);
+      const hashedPassword = await hashPassword(password);
+      
+      console.log("secretKey: "+secretKey)
+      console.log("encryptedMnemonic: "+encryptedMnemonic)
+      console.log("hashedPassword: "+hashedPassword)
 
-      const response = await AccessWalletService(decryptedMnemonic);
+      const response = await AccessWalletService(encryptedMnemonic, password);
 
       if (response.success) {
         login(response.data.accessToken, response.data.refreshToken);

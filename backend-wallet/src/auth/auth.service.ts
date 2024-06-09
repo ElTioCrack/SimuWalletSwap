@@ -4,6 +4,7 @@ import ApiResponse from './../interfaces/api-response.interface';
 import { WalletService } from './../wallet/wallet.service';
 import { CreateWalletDto } from 'src/wallet/dto/wallet.dto';
 import JwtUtils from '../utils/jwt.utils';
+import { LoginWalletDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -44,10 +45,60 @@ export class AuthService {
     }
   }
 
-  async login(walletData: any): Promise<ApiResponse<any>> {
+  // async login(walletData: any): Promise<ApiResponse<any>> {
+  //   try {
+  //     const wallet = await this.walletService.findOneByPublicKey(
+  //       walletData.publicKey,
+  //     );
+  //     if (!wallet.success) {
+  //       return {
+  //         statusCode: HttpStatus.UNAUTHORIZED,
+  //         success: false,
+  //         message: 'Invalid credentials',
+  //         data: null,
+  //       };
+  //     }
+
+  //     // Verificar la contraseña
+  //     const isPasswordValid = await bcrypt.compare(
+  //       walletData.password,
+  //       wallet.data.password,
+  //     );
+  //     if (!isPasswordValid) {
+  //       return {
+  //         statusCode: HttpStatus.UNAUTHORIZED,
+  //         success: false,
+  //         message: 'Invalid credentials',
+  //         data: null,
+  //       };
+  //     }
+
+  //     // Generar tokens de acceso y de actualización
+  //     const accessToken = JwtUtils.generateAccessToken(wallet.data._id);
+  //     const refreshToken = JwtUtils.generateRefreshToken(wallet.data._id);
+
+  //     return {
+  //       statusCode: HttpStatus.OK,
+  //       success: true,
+  //       message: 'Credentials are correct',
+  //       data: { accessToken, refreshToken },
+  //     };
+  //   } catch (error) {
+  //     return {
+  //       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+  //       success: false,
+  //       message: 'Failed to access wallet',
+  //       data: null,
+  //     };
+  //   }
+  // }
+
+  async loginWithMnemonic(
+    walletData: LoginWalletDto,
+  ): Promise<ApiResponse<any>> {
     try {
-      const wallet = await this.walletService.findOneByPublicKey(
-        walletData.publicKey,
+      const wallet = await this.walletService.findOneByMnemonic(
+        walletData.mnemonic,
       );
       if (!wallet.success) {
         return {
@@ -63,11 +114,13 @@ export class AuthService {
         walletData.password,
         wallet.data.password,
       );
+      // const isPasswordValid = walletData.password == wallet.data.password
+
       if (!isPasswordValid) {
         return {
           statusCode: HttpStatus.UNAUTHORIZED,
           success: false,
-          message: 'Invalid credentials',
+          message: 'Invalid credentials2',
           data: null,
         };
       }

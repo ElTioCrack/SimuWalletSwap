@@ -9,7 +9,7 @@ enum TransactionType {
 @Schema()
 class Transaction {
   @Prop({ enum: Object.values(TransactionType), required: true })
-  type: TransactionType;
+  type: TransactionType | string;
 
   @Prop({ required: true })
   token: string;

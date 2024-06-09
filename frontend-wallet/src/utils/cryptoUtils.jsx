@@ -7,14 +7,22 @@ const generateSecretKey = (password) => {
 };
 
 const encryptData = (data, secretKey) => {
-  const encryptedData = CryptoJS.AES.encrypt(data, secretKey).toString();
+  const iv = CryptoJS.enc.Hex.parse("00000000000000000000000000000000");
+  const encryptedData = CryptoJS.AES.encrypt(data, CryptoJS.enc.Hex.parse(secretKey), {
+    iv: iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7
+  }).toString();
   return encryptedData;
 };
 
 const decryptData = (encryptedData, secretKey) => {
-  const decryptedData = CryptoJS.AES.decrypt(encryptedData, secretKey).toString(
-    CryptoJS.enc.Utf8
-  );
+  const iv = CryptoJS.enc.Hex.parse("00000000000000000000000000000000");
+  const decryptedData = CryptoJS.AES.decrypt(encryptedData, CryptoJS.enc.Hex.parse(secretKey), {
+    iv: iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7
+  }).toString(CryptoJS.enc.Utf8);
   return decryptedData;
 };
 
