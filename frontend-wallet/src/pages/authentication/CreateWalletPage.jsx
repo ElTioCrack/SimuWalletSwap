@@ -18,7 +18,7 @@ import { CreateWalletService } from "../../services/WalletServices.jsx";
 
 function CreateWalletPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, setPublicKey, isLoggedIn } = useAuth();
 
   const [step, setStep] = useState(1);
   const totalWords = 12;
@@ -31,6 +31,12 @@ function CreateWalletPage() {
   useEffect(() => {
     generateRecoveryPhrase();
   }, []);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/wallet");
+    }
+  }, [isLoggedIn, navigate]);
 
   const generateRandomPhrase = () => {
     // const phraseOptions = [
@@ -195,13 +201,10 @@ function CreateWalletPage() {
         publicKey: publicKey,
       };
 
-      console.log(`walletData:\n${JSON.stringify(walletData)}`);
-      
       const response = await CreateWalletService(walletData);
 
-      console.log(`response:\n${JSON.stringify(response)}`);
-
       if (response.success) {
+        setPublicKey(setPublicKey);
         login(response.data.accessToken, response.data.refreshToken);
         navigate("/wallet");
       } else {
@@ -427,7 +430,7 @@ function CreateWalletPage() {
           Access it here
         </Link>
       </div>
-      
+
       <div className="select-none">
         <Link
           to="/"

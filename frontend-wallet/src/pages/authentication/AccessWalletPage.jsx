@@ -5,17 +5,24 @@ import PasswordInput from "../../components/inputs/PasswordInput";
 
 import { useAuth } from "../../auth/AuthProvider";
 
-import { encryptData, generateSecretKey, hashPassword } from "../../utils/cryptoUtils.jsx";
+import {
+  encryptData,
+  generateSecretKey,
+  hashPassword,
+  generateWalletKeys,
+} from "../../utils/cryptoUtils.jsx";
 
 import { AccessWalletService } from "../../services/WalletServices.jsx";
 
 function AccessWalletPage() {
   const navigate = useNavigate();
-  const { login, isLoggedIn } = useAuth();
+  const { login, setPublicKey, isLoggedIn } = useAuth();
 
   const [step, setStep] = useState(1);
   const totalWords = 12;
-  const [recoveryPhrase, setRecoveryPhrase] = useState(Array(totalWords).fill(""));
+  const [recoveryPhrase, setRecoveryPhrase] = useState(
+    Array(totalWords).fill("")
+  );
   const passwordRef = useRef(null);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -31,7 +38,9 @@ function AccessWalletPage() {
       if (words.length === totalWords) {
         setRecoveryPhrase(words);
       } else {
-        alert(`Please make sure you have exactly ${totalWords} words in your clipboard.`);
+        alert(
+          `Please make sure you have exactly ${totalWords} words in your clipboard.`
+        );
       }
     });
   };
@@ -43,7 +52,7 @@ function AccessWalletPage() {
   };
 
   const validateInputs = () => {
-    if (recoveryPhrase.every(word => word !== "")) {
+    if (recoveryPhrase.every((word) => word !== "")) {
       setStep(2);
       setErrorMessage("");
     } else {
@@ -60,7 +69,9 @@ function AccessWalletPage() {
       if (words.length === totalWords) {
         setRecoveryPhrase(words);
       } else {
-        alert(`Please make sure the file contains exactly ${totalWords} words.`);
+        alert(
+          `Please make sure the file contains exactly ${totalWords} words.`
+        );
       }
     };
     reader.readAsText(file);
@@ -71,17 +82,15 @@ function AccessWalletPage() {
       const mnemonic = recoveryPhrase.join(" ");
       const password = passwordRef.current.getValue();
       const secretKey = generateSecretKey(password);
-      
+
       const encryptedMnemonic = await encryptData(mnemonic, secretKey);
-      const hashedPassword = await hashPassword(password);
-      
-      console.log("secretKey: "+secretKey)
-      console.log("encryptedMnemonic: "+encryptedMnemonic)
-      console.log("hashedPassword: "+hashedPassword)
 
       const response = await AccessWalletService(encryptedMnemonic, password);
 
       if (response.success) {
+        const { privateKey, publicKey } = generateWalletKeys(mnemonic);
+
+        setPublicKey(publicKey);
         login(response.data.accessToken, response.data.refreshToken);
         navigate("/wallet");
       } else {

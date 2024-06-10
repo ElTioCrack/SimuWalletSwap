@@ -10,8 +10,8 @@ const AuthContext = createContext({
   isLoggedIn: false,
   login: () => {},
   logout: () => {},
-  getWalletInfo: () => null,
-  setWalletInfoAsync: () => {},
+  getPublicKey: () => null,
+  setPublicKey: () => {},
   getAccessToken: () => "",
   getRefreshToken: () => "",
 });
@@ -20,7 +20,6 @@ const useAuth = () => useContext(AuthContext);
 
 const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [walletInfo, setWalletInfo] = useState(null);
   const [accessToken, setAccessToken] = useState("");
   const [refreshToken, setRefreshToken] = useState("");
   const [isLoading, setIsLoading] = useState(true); // Nuevo estado para manejar la carga inicial
@@ -29,18 +28,18 @@ const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const getWalletInfo = () => walletInfo;
-
-  const setWalletInfoAsync = async (publicKey) => {
-    try {
-      const response = await fetchWalletInfo(publicKey);
-      setWalletInfo(response.data);
-      return response;
-    } catch (error) {
-      console.error("Error fetching wallet info:", error);
-      return null;
-    }
+  const getPublicKey = () => {
+    return localStorage.getItem("publicKey");
   };
+
+  const setPublicKey = (publicKey) => {
+    localStorage.setItem("publicKey", publicKey);
+    };
+    
+  const removePublicKey = () => {
+    localStorage.removeItem("publicKey");
+  }
+  
 
   const getAccessToken = () => accessToken;
 
@@ -56,11 +55,11 @@ const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setIsLoggedIn(false);
-    setWalletInfo(null);
     setAccessToken("");
     setRefreshToken("");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    removePublicKey()
   };
 
   const checkAuth = async () => {
@@ -110,8 +109,8 @@ const AuthProvider = ({ children }) => {
         isLoggedIn,
         login,
         logout,
-        getWalletInfo,
-        setWalletInfoAsync,
+        getPublicKey,
+        setPublicKey,
         getAccessToken,
         getRefreshToken,
       }}

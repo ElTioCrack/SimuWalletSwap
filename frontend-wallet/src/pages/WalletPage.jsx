@@ -15,6 +15,7 @@ function WalletPage() {
   initialHoldings.forEach((holding) => {
     holding.value = calculateValue(holding.price, holding.amount);
   });
+  const { getPublicKey } = useAuth();
 
   const [holdings, setHoldings] = useState(initialHoldings);
   const [balance, setBalance] = useState(calculateBalance(initialHoldings));
