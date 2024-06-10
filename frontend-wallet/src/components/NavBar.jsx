@@ -39,9 +39,9 @@ function NavBar() {
           <div className="hidden lg:flex">
             <ThemeToggle />
           </div>
-          <button className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg transition duration-300">
+          {/* <button className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg transition duration-300">
             Settings
-          </button>
+          </button> */}
           <button
             className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition duration-300"
             onClick={handleLogout}

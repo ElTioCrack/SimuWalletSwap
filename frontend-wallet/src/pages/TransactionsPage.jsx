@@ -150,8 +150,8 @@ function TransactionsPage() {
                       </button>
                     </div>
                   </td>
-                  <td className="px-4 py-2">{transaction.timestamp.split(' ')[0]}</td>
-                  <td className="px-4 py-2">{transaction.timestamp.split(' ')[1]}</td>
+                  <td className="px-4 py-2">{transaction.timestamp.split('T')[0]}</td>
+                  <td className="px-4 py-2">{transaction.timestamp.split('T')[1]}</td>
                   <td className="px-4 py-2">
                     <button
                       onClick={() => handleCopy(transaction.address)}
