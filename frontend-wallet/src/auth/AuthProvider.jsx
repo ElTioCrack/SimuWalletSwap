@@ -10,10 +10,11 @@ const AuthContext = createContext({
   isLoggedIn: false,
   login: () => {},
   logout: () => {},
-  getPublicKey: () => null,
-  setPublicKey: () => {},
   getAccessToken: () => "",
   getRefreshToken: () => "",
+  publicKey: null,
+  setPublicKey: () => {},
+  initializePublicKey: () => {},
 });
 
 const useAuth = () => useContext(AuthContext);
@@ -22,24 +23,30 @@ const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState("");
   const [refreshToken, setRefreshToken] = useState("");
-  const [isLoading, setIsLoading] = useState(true); // Nuevo estado para manejar la carga inicial
+  const [publicKey, setPublicKey] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     checkAuth();
+    initializePublicKey();
   }, []);
 
-  const getPublicKey = () => {
-    return localStorage.getItem("publicKey");
+  const initializePublicKey = () => {
+    const storedPublicKey = localStorage.getItem("publicKey");
+    if (storedPublicKey) {
+      setPublicKey(storedPublicKey);
+    }
   };
 
-  const setPublicKey = (publicKey) => {
-    localStorage.setItem("publicKey", publicKey);
-    };
-    
+  const handleSetPublicKey = (key) => {
+    setPublicKey(key);
+    localStorage.setItem("publicKey", key);
+  };
+
   const removePublicKey = () => {
+    setPublicKey(null);
     localStorage.removeItem("publicKey");
-  }
-  
+  };
 
   const getAccessToken = () => accessToken;
 
@@ -59,7 +66,7 @@ const AuthProvider = ({ children }) => {
     setRefreshToken("");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-    removePublicKey()
+    removePublicKey();
   };
 
   const checkAuth = async () => {
@@ -109,10 +116,11 @@ const AuthProvider = ({ children }) => {
         isLoggedIn,
         login,
         logout,
-        getPublicKey,
-        setPublicKey,
         getAccessToken,
         getRefreshToken,
+        publicKey,
+        setPublicKey: handleSetPublicKey,
+        initializePublicKey,
       }}
     >
       {children}

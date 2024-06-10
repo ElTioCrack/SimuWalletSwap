@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NavBar from "../components/NavBar";
+import GetWalletTransactionsService from "../services/GetWalletTransactionsService";
+import { useAuth } from "../auth/AuthProvider";
 
 // Enum para el tipo de transacción
 const TransactionType = {
   SEND: 'send',
   RECEIVE: 'receive',
+  PENDING: 'pending',
+  FAILED: 'failed',
 };
 
 // Clase para las transacciones
@@ -18,17 +22,27 @@ class Transaction {
   }
 }
 
-// Ejemplo de transacciones con direcciones inventadas
-const transactions = [
-  new Transaction(TransactionType.SEND, 'Bitcoin', 0.1, '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', '2024-06-01 14:32'),
-  new Transaction(TransactionType.RECEIVE, 'Ethereum', 2, '0x742d35Cc6634C0532925a3b844Bc454e4438f44e', '2024-06-01 15:45'),
-  new Transaction(TransactionType.SEND, 'Ripple', 150, 'rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1', '2024-06-02 10:15'),
-];
-
 function TransactionsPage() {
+  const { publicKey } = useAuth();
+  const [transactions, setTransactions] = useState([]);
   const [showFullAddress, setShowFullAddress] = useState(null);
-  const [sortedTransactions, setSortedTransactions] = useState(transactions);
-  const [sortOrder, setSortOrder] = useState('asc'); // asc or desc
+  const [sortedTransactions, setSortedTransactions] = useState([]);
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [filter, setFilter] = useState('all'); // all, send, receive, pending, failed
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      const response = await GetWalletTransactionsService(publicKey);
+      if (response.success) {
+        setTransactions(response.data);
+        setSortedTransactions(response.data);
+      } else {
+        alert("Error fetching transactions: " + response.message);
+      }
+    };
+
+    fetchTransactions();
+  }, [publicKey]);
 
   const toggleAddressView = (index) => {
     if (showFullAddress === index) {
@@ -55,6 +69,17 @@ function TransactionsPage() {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
+  const handleFilterChange = (event) => {
+    const filter = event.target.value;
+    setFilter(filter);
+
+    if (filter === 'all') {
+      setSortedTransactions(transactions);
+    } else {
+      setSortedTransactions(transactions.filter(transaction => transaction.type === filter));
+    }
+  };
+
   return (
     <>
       <NavBar />
@@ -62,12 +87,25 @@ function TransactionsPage() {
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Transaction History</h2>
-            <button
-              onClick={sortTransactions}
-              className="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-lg"
-            >
-              Sort by Date {sortOrder === 'asc' ? '↑' : '↓'}
-            </button>
+            <div>
+              <select
+                onChange={handleFilterChange}
+                className="bg-gray-200 border border-gray-300 rounded-lg py-2 px-3 mr-4"
+                value={filter}
+              >
+                <option value="all">All</option>
+                <option value="send">Send</option>
+                <option value="receive">Receive</option>
+                <option value="pending">Pending</option>
+                <option value="failed">Failed</option>
+              </select>
+              <button
+                onClick={sortTransactions}
+                className="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-lg"
+              >
+                Sort by Date {sortOrder === 'asc' ? '↑' : '↓'}
+              </button>
+            </div>
           </div>
           <table className="min-w-full divide-y divide-gray-200">
             <thead>
@@ -82,13 +120,17 @@ function TransactionsPage() {
               </tr>
             </thead>
             <tbody>
-              {sortedTransactions.map((transaction, index) => (
+              {sortedTransactions && sortedTransactions.map((transaction, index) => (
                 <tr key={index} className="border-b">
                   <td className="px-4 py-2">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       transaction.type === TransactionType.SEND
                         ? 'bg-red-100 text-red-800'
-                        : 'bg-green-100 text-green-800'
+                        : transaction.type === TransactionType.RECEIVE
+                        ? 'bg-green-100 text-green-800'
+                        : transaction.type === TransactionType.PENDING
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-gray-100 text-gray-800'
                     }`}>
                       {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
                     </span>

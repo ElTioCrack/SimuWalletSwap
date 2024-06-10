@@ -2,25 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../auth/AuthProvider.jsx";
 import NavBar from "../components/NavBar.jsx";
 import QRCode from "qrcode.react";
+import GetCryptoHoldingsService from "../services/GetCryptoHoldingsService.jsx";
+import GetSolanaPriceService from "../services/GetSolanaPriceService.jsx";
+import CreateTransactionService from "../services/CreateTransactionService.jsx"; // Importa la función creada
 
 function WalletPage() {
-  const publicKey = "72u2gtWF89LYfTNc5KQ3ZzxoxZ6kX3dH5tZcXAWe2pjq";
-  const initialHoldings = [
-    { name: "Bitcoin", amount: "0.5", price: "50000" },
-    { name: "Ethereum", amount: "10", price: "3000" },
-    { name: "Ripple", amount: "200", price: "1.5" },
-  ];
+  const { publicKey } = useAuth();
 
-  // Calculate values for each holding
-  initialHoldings.forEach((holding) => {
-    holding.value = calculateValue(holding.price, holding.amount);
-  });
-  const { getPublicKey } = useAuth();
-
-  const [holdings, setHoldings] = useState(initialHoldings);
-  const [balance, setBalance] = useState(calculateBalance(initialHoldings));
+  const [holdings, setHoldings] = useState([]);
+  const [balance, setBalance] = useState(0);
   const [showReceiveModal, setShowReceiveModal] = useState(false);
   const [showSendModal, setShowSendModal] = useState(false);
+  const [showQrScanner, setShowQrScanner] = useState(false);
   const [selectedToken, setSelectedToken] = useState("");
   const [amount, setAmount] = useState("0");
   const [recipient, setRecipient] = useState("");
@@ -28,8 +21,40 @@ function WalletPage() {
   const [isSendButtonEnabled, setIsSendButtonEnabled] = useState(false);
 
   useEffect(() => {
+    if (publicKey) {
+      fetchHoldingsAndPrices();
+    }
+  }, [publicKey]);
+
+  useEffect(() => {
     validateSendButton();
   }, [amount, recipient]);
+
+  const fetchHoldingsAndPrices = async () => {
+    try {
+      const holdingsResponse = await GetCryptoHoldingsService(publicKey);
+      const solanaPrice = await GetSolanaPriceService();
+
+      if (holdingsResponse.success && solanaPrice) {
+        const holdingsData = holdingsResponse.data;
+        const updatedHoldings = holdingsData.map((holding) => {
+          let price = holding.token === "SOL" ? solanaPrice : holding.price;
+          return {
+            ...holding,
+            price: price,
+            value: calculateValue(price, holding.amount),
+          };
+        });
+
+        setHoldings(updatedHoldings);
+        setBalance(calculateBalance(updatedHoldings));
+      } else {
+        console.error("Error fetching holdings or price");
+      }
+    } catch (error) {
+      console.error("Error fetching holdings and prices:", error);
+    }
+  };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(publicKey);
@@ -69,10 +94,11 @@ function WalletPage() {
   const handleCloseModal = () => {
     setShowReceiveModal(false);
     setShowSendModal(false);
+    setShowQrScanner(false);
   };
 
-  const handleSendTokens = () => {
-    const selectedHolding = holdings.find((h) => h.name === selectedToken);
+  const handleSendTokens = async () => {
+    const selectedHolding = holdings.find((h) => h.token === selectedToken);
     if (
       parseFloat(amount) <= 0 ||
       parseFloat(amount) > parseFloat(selectedHolding.amount)
@@ -83,13 +109,30 @@ function WalletPage() {
       return;
     }
 
-    // Lógica para enviar tokens
-    alert(`Sending ${amount} ${selectedToken} to ${recipient}`);
+    try {
+      const response = await CreateTransactionService({
+        publicKeyOrigin: publicKey,
+        publicKeyDestination: recipient,
+        token: selectedToken,
+        amount: parseFloat(amount),
+      });
+
+      if (response.success) {
+        alert("Transaction created successfully");
+        fetchHoldingsAndPrices(); // Actualiza los holdings y el balance después de la transacción
+      } else {
+        alert("Error creating transaction: " + response.message);
+      }
+    } catch (error) {
+      console.error("Error creating transaction:", error);
+      alert("Error creating transaction");
+    }
+
     handleCloseModal();
   };
 
   const validateSendButton = () => {
-    const selectedHolding = holdings.find((h) => h.name === selectedToken);
+    const selectedHolding = holdings.find((h) => h.token === selectedToken);
     if (
       parseFloat(amount) > 0 &&
       parseFloat(amount) <= parseFloat(selectedHolding.amount) &&
@@ -99,6 +142,23 @@ function WalletPage() {
     } else {
       setIsSendButtonEnabled(false);
     }
+  };
+
+  const handleScan = (data) => {
+    alert("QR code scanning functionality not implemented yet.");
+    // if (data) {
+    //   setRecipient(data);
+    //   setShowQrScanner(false);
+    // }
+  };
+
+  const handleError = (err) => {
+    console.error(err);
+  };
+
+  const calculateSolanaFee = (amount) => {
+    const solanaFeeRate = 0.000005;
+    return (amount * solanaFeeRate).toFixed(6);
   };
 
   return (
@@ -148,7 +208,7 @@ function WalletPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead>
               <tr>
-                <th className="px-4 py-2 text-left text-gray-500">Name</th>
+                <th className="px-4 py-2 text-left text-gray-500">Token</th>
                 <th className="px-4 py-2 text-left text-gray-500">Price</th>
                 <th className="px-4 py-2 text-left text-gray-500">Value</th>
                 <th className="px-4 py-2 text-left text-gray-500">Amount</th>
@@ -158,16 +218,16 @@ function WalletPage() {
             <tbody>
               {holdings.map((holding, index) => (
                 <tr key={index} className="border-b">
-                  <td className="px-4 py-2">{holding.name}</td>
+                  <td className="px-4 py-2">{holding.token}</td>
                   <td className="px-4 py-2">${holding.price}</td>
                   <td className="px-4 py-2">${holding.value}</td>
                   <td className="px-4 py-2">{holding.amount}</td>
                   <td className="px-4 py-2">
                     <button
                       className="bg-indigo-500 hover:bg-indigo-600 text-white py-1 px-3 rounded-lg shadow-sm"
-                      onClick={() => handleSend(holding.name)}
+                      onClick={() => handleSend(holding.token)}
                     >
-                      Trade
+                      Send
                     </button>
                   </td>
                 </tr>
@@ -197,18 +257,18 @@ function WalletPage() {
                 className="shadow-md p-2 rounded-md"
               />
             </div>
-            <p className="mb-4 text-gray-700 text-center font-mono">
-              {publicKey}
-            </p>
-            <div className="flex justify-center space-x-4">
+            <div className="mb-4 text-center">
+              <p className="text-gray-700 font-mono break-all bg-gray-100 p-2 rounded-md">
+                {publicKey}
+              </p>
+            </div>
+            <div className="flex justify-center space-x-4 mt-4">
               <button
                 onClick={handleCopy}
                 className="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-lg shadow-md transition duration-300 select-none"
               >
                 Copy Address
               </button>
-            </div>
-            <div className="flex justify-center mt-6">
               <button
                 onClick={handleCloseModal}
                 className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg shadow-md transition duration-300 select-none"
@@ -239,8 +299,8 @@ function WalletPage() {
                 onChange={(e) => setSelectedToken(e.target.value)}
               >
                 {holdings.map((holding, index) => (
-                  <option key={index} value={holding.name}>
-                    {holding.name}
+                  <option key={index} value={holding.token}>
+                    {holding.token}
                   </option>
                 ))}
               </select>
@@ -248,7 +308,7 @@ function WalletPage() {
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">
                 Amount (Max:{" "}
-                {holdings.find((h) => h.name === selectedToken)?.amount || 0})
+                {holdings.find((h) => h.token === selectedToken)?.amount || 0})
               </label>
               <input
                 type="number"
@@ -257,7 +317,7 @@ function WalletPage() {
                 onChange={(e) => {
                   const value = e.target.value;
                   const selectedHolding = holdings.find(
-                    (h) => h.name === selectedToken
+                    (h) => h.token === selectedToken
                   );
                   if (parseFloat(value) > parseFloat(selectedHolding.amount)) {
                     setAmount(selectedHolding.amount.toString());
@@ -267,7 +327,11 @@ function WalletPage() {
                 }}
                 min="0"
               />
+              <span className="ml-4 text-gray-700 text-sm">
+                Fee: {calculateSolanaFee(amount)} SOL
+              </span>
             </div>
+
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">
                 Recipient Address
@@ -284,6 +348,12 @@ function WalletPage() {
                   className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-r-lg shadow-sm"
                 >
                   Paste
+                </button>
+                <button
+                  onClick={() => setShowQrScanner(true)}
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 ml-2 rounded-lg shadow-sm"
+                >
+                  Scan
                 </button>
               </div>
             </div>
@@ -305,6 +375,27 @@ function WalletPage() {
             >
               Close
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal QR Scanner */}
+      {showQrScanner && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative">
+            <button
+              onClick={() => setShowQrScanner(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+            >
+              &times;
+            </button>
+            <h2 className="text-xl font-semibold mb-4">Scan QR Code</h2>
+            <QrReader
+              delay={300}
+              onError={handleError}
+              onScan={handleScan}
+              style={{ width: "100%" }}
+            />
           </div>
         </div>
       )}
