@@ -204,7 +204,7 @@ function CreateWalletPage() {
       const response = await CreateWalletService(walletData);
 
       if (response.success) {
-        setPublicKey(setPublicKey);
+        setPublicKey(publicKey);
         login(response.data.accessToken, response.data.refreshToken);
         navigate("/wallet");
       } else {
