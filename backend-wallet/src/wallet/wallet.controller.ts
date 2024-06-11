@@ -68,6 +68,26 @@ export class WalletController {
     }
   }
 
+  @Get('public')
+  @SwaggerApiResponse({
+    status: 200,
+    description: 'Public wallets retrieved successfully.',
+  })
+  @SwaggerApiResponse({ status: 500, description: 'Internal Server Error.' })
+  async getAllPublicWallets(): Promise<ApiResponse<any>> {
+    try {
+      const wallets = await this.walletService.findAllPublic();
+      return wallets;
+    } catch (error) {
+      return {
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        success: false,
+        message: 'Failed to retrieve wallets',
+        data: 'controller: ' + error.message,
+      };
+    }
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a wallet by ID' })
   @SwaggerApiResponse({

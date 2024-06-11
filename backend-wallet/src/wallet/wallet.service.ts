@@ -58,7 +58,32 @@ export class WalletService {
       };
     }
   }
-  
+
+  async findAllPublic(): Promise<ApiResponse<any>> {
+    try {
+      const wallets = await this.walletRepository.findAll();
+      const publicWallets = wallets.data.map((wallet: Wallet) => ({
+        _id: wallet._id,
+        publicKey: wallet.publicKey,
+        createdAt: wallet.createdAt,
+        cryptoHoldings: wallet.cryptoHoldings,
+        transactions: wallet.transactions,
+      }));
+      return {
+        statusCode: HttpStatus.OK,
+        success: true,
+        message: 'Wallets retrieved successfully',
+        data: publicWallets,
+      };
+    } catch (error) {
+      return {
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        success: false,
+        message: 'Failed to retrieve wallets',
+        data: 'service: ' + error.message,
+      };
+    }
+  }
 
   async findOneById(id: string): Promise<ApiResponse<any>> {
     try {
