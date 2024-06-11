@@ -14,6 +14,9 @@ import {
   WalletPage,
 } from "./pages/MyPages";
 
+import AllWallets from "./pages/AllWallets";
+import AllTransactions from "./pages/AllTransactions";
+
 import "./index.css";
 
 import Example from "./pages/Example";
@@ -32,6 +35,14 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+  },
+  {
+    path: "/allwallets",
+    element: <AllWallets />,
+  },
+  {
+    path: "/alltransactions",
+    element: <AllTransactions />,
   },
   {
     path: "/createwallet",
@@ -62,17 +73,20 @@ const MainApp = () => {
 
   React.useEffect(() => {
     const handleMessage = (event) => {
-      if (event.origin === 'https://swap.example.com' && event.data.type === 'publicKeyRequest') {
-        const publicKeyResponse = { type: 'publicKeyResponse', publicKey };
+      if (
+        event.origin === "https://swap.example.com" &&
+        event.data.type === "publicKeyRequest"
+      ) {
+        const publicKeyResponse = { type: "publicKeyResponse", publicKey };
         window.postMessage(publicKeyResponse, event.origin);
       }
     };
 
-    window.addEventListener('message', handleMessage);
+    window.addEventListener("message", handleMessage);
 
     // Cleanup event listener on component unmount
     return () => {
-      window.removeEventListener('message', handleMessage);
+      window.removeEventListener("message", handleMessage);
     };
   }, [publicKey]);
 

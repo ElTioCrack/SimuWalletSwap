@@ -9,8 +9,8 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 
 const navigation = [
-  { name: "Wallets", href: "/wallets" },
-  { name: "Transactions", href: "/transactions" },
+  { name: "Wallets", href: "/allwallets" },
+  { name: "Transactions", href: "/alltransactions" },
 ];
 
 function App() {

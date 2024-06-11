@@ -20,7 +20,7 @@ function NavBar() {
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link to="/" className="flex items-center">
           <img
-            src="../../public/WalletLogo.png"
+            src="/WalletLogo.png"
             alt="Wallet Logo"
             className="h-10 w-10 mr-3"
           />
