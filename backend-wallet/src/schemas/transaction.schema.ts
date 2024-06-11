@@ -1,9 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
 
 enum TransactionType {
   SEND = 'send',
   RECEIVE = 'receive',
+  PENDING = 'pending',
+  FAILED = 'failed',
 }
 
 @Schema()

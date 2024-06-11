@@ -1,3 +1,4 @@
-export { CryptoHolding, CryptoHoldingSchema } from "./crypto-holding.schema";
-export { Wallet, WalletSchema } from "./wallet.schema";
-export { Transaction, TransactionType, TransactionSchema } from "./transaction.schema";
+export * from "./crypto-holding.schema";
+export * from "./wallet.schema";
+export * from "./transaction.schema";
+export * from './all-transactions.schema'
