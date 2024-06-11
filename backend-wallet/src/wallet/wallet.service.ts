@@ -58,6 +58,7 @@ export class WalletService {
       };
     }
   }
+  
 
   async findOneById(id: string): Promise<ApiResponse<any>> {
     try {
