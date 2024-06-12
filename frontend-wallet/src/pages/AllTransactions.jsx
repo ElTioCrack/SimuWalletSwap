@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import NavBar from "../components/NavBar";
-import GetAllTransactionsService from "../services/GetAllTransactionsService";
+import GetAllTransactionsService from "../services/AllTransactions/GetAllTransactionsService";
 
 function AllTransactions() {
   const [transactions, setTransactions] = useState([]);
@@ -87,7 +87,6 @@ function AllTransactions() {
 
   return (
     <>
-      <NavBar />
       <main className="container mx-auto px-4 py-8 min-h-screen">
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4">All Transactions</h2>
@@ -122,7 +121,7 @@ function AllTransactions() {
                   Filter by Status
                 </label>
                 <select
-                  // name="status"
+                  name="status"
                   value={filters.status}
                   onChange={handleFilterChange}
                   className="w-full bg-gray-100 border border-gray-300 rounded-lg py-2 px-3 mb-4"
@@ -232,8 +231,8 @@ function AllTransactions() {
                       <td className="px-4 py-2">
                         {new Date(transaction.timestamp).toLocaleTimeString()}
                       </td>
-                      <td className="px-4 py-2">{transaction.from}</td>
-                      <td className="px-4 py-2">{transaction.to}</td>
+                      <td className="px-4 py-2">{truncateAddress(transaction.from)}</td>
+                      <td className="px-4 py-2">{truncateAddress(transaction.to)}</td>
                       <td className="px-4 py-2">{transaction.amount}</td>
                       <td className="px-4 py-2">{transaction.token}</td>
                       <td className="px-4 py-2">

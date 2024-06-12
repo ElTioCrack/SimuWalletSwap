@@ -6,6 +6,7 @@ import { useAuth } from "../auth/AuthProvider.jsx";
 const navigation = [
   { name: "Wallet", href: "/wallet" },
   { name: "Transactions", href: "/wallet/transactions" },
+  { name: "Minning", href: "/wallet/mining" },
 ];
 
 function NavBar() {

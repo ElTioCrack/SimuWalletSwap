@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import NavBar from "../components/NavBar";
-import GetWalletTransactionsService from "../services/GetWalletTransactionsService";
+import GetWalletTransactionsService from "../services/wallet/GetWalletTransactionsService";
 import { useAuth } from "../auth/AuthProvider";
 
 // Enum para el tipo de transacción

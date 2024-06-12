@@ -40,6 +40,10 @@ export class AllTransaction extends Document {
   @ApiProperty({ description: 'Token of the transaction' })
   @Prop({ required: true })
   token: string;
+
+  @ApiProperty({ description: 'Commission of the transaction' })
+  @Prop({ required: true })
+  commission: number;
 }
 
 export const AllTransactionSchema = SchemaFactory.createForClass(AllTransaction);

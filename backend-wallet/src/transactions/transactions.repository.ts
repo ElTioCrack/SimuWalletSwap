@@ -12,9 +12,13 @@ export class TransactionsRepository {
     private readonly transactionModel: Model<Transaction>,
   ) {}
 
-  async createTransaction(createTransactionDto: Transaction): Promise<ApiResponse<any>> {
+  async createTransaction(
+    createTransactionDto: Transaction,
+  ): Promise<ApiResponse<any>> {
     try {
-      const createdTransaction = new this.transactionModel(createTransactionDto);
+      const createdTransaction = new this.transactionModel(
+        createTransactionDto,
+      );
       const savedTransaction = await createdTransaction.save();
       return {
         statusCode: HttpStatus.CREATED,
@@ -81,6 +85,38 @@ export class TransactionsRepository {
         success: false,
         message: 'Failed to retrieve transaction',
         data: null,
+      };
+    }
+  }
+
+  async findByAllTransactionId(
+    allTransactionId: string,
+  ): Promise<ApiResponse<any>> {
+    try {
+      const transaction = await this.transactionModel
+        .findOne({ allTransactionId })
+        .exec();
+      if (!transaction) {
+        return {
+          statusCode: HttpStatus.NOT_FOUND,
+          success: false,
+          message: 'Transaction not found',
+          data: null,
+        };
+      }
+
+      return {
+        statusCode: HttpStatus.OK,
+        success: true,
+        message: 'Transaction retrieved successfully',
+        data: transaction,
+      };
+    } catch (error) {
+      return {
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        success: false,
+        message: 'Failed to retrieve transaction',
+        data: `Exception: ${error.message}`,
       };
     }
   }

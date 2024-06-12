@@ -22,6 +22,7 @@ import "./index.css";
 import Example from "./pages/Example";
 import Component from "./pages/component";
 import TransactionsPage from "./pages/TransactionsPage";
+import MiningPage from "./pages/MiningPage";
 
 const router = createBrowserRouter([
   {
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
       {
         path: "/wallet/transactions",
         element: <TransactionsPage />,
+      },
+      {
+        path: "/wallet/mining",
+        element: <MiningPage />,
       },
     ],
   },

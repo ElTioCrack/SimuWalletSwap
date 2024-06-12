@@ -1,12 +1,13 @@
-import { IsNotEmpty, IsString, IsNumber, IsEnum } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsOptional,
+  IsDateString,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { TransactionStatus } from 'src/schemas';
 
 export class CreateTransactionDto {
-  @IsNotEmpty()
-  @ApiProperty({ description: 'Timestamp of the transaction' })
-  readonly timestamp: Date;
-
   @IsNotEmpty()
   @IsString()
   @ApiProperty({ description: 'Sender wallet' })
@@ -26,4 +27,14 @@ export class CreateTransactionDto {
   @IsString()
   @ApiProperty({ description: 'Token of the transaction' })
   readonly token: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @ApiProperty({ description: 'Commission of the transaction' })
+  readonly commission: number;
+
+  @IsOptional()
+  @IsDateString()
+  @ApiProperty({ description: 'Timestamp of the transaction', required: false })
+  readonly timestamp?: string;
 }

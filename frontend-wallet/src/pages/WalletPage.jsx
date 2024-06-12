@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../auth/AuthProvider.jsx";
 import NavBar from "../components/NavBar.jsx";
 import QRCode from "qrcode.react";
-import GetCryptoHoldingsService from "../services/GetCryptoHoldingsService.jsx";
+import GetCryptoHoldingsService from "../services/CryptoHolding/GetCryptoHoldingsService.jsx";
 import GetSolanaPriceService from "../services/GetSolanaPriceService.jsx";
-import CreateTransactionService from "../services/CreateTransactionService.jsx"; // Importa la función creada
+import ProcessTransactionService from "../services/AllTransactions/ProcessTransactionService.jsx";
 
 function WalletPage() {
   const { publicKey } = useAuth();
@@ -33,7 +33,10 @@ function WalletPage() {
   const fetchHoldingsAndPrices = async () => {
     try {
       const holdingsResponse = await GetCryptoHoldingsService(publicKey);
+      console.log(publicKey)
+      console.log(holdings)
       const solanaPrice = await GetSolanaPriceService();
+      console.log(solanaPrice)
 
       if (holdingsResponse.success && solanaPrice) {
         const holdingsData = holdingsResponse.data;
@@ -110,11 +113,12 @@ function WalletPage() {
     }
 
     try {
-      const response = await CreateTransactionService({
-        publicKeyOrigin: publicKey,
-        publicKeyDestination: recipient,
-        token: selectedToken,
+      const response = await ProcessTransactionService({
+        from: publicKey,
+        to: recipient,
         amount: parseFloat(amount),
+        token: selectedToken,
+        commission: calculateSolanaFee(amount),
       });
 
       if (response.success) {
@@ -157,7 +161,7 @@ function WalletPage() {
   };
 
   const calculateSolanaFee = (amount) => {
-    const solanaFeeRate = 0.000005;
+    const solanaFeeRate = 0.05;
     return (amount * solanaFeeRate).toFixed(6);
   };
 

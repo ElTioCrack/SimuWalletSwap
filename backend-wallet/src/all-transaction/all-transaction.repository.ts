@@ -12,7 +12,7 @@ export class AllTransactionRepository {
     private readonly transactionModel: Model<AllTransaction>,
   ) {}
 
-  async createTransaction(
+  async create(
     createTransactionDto: CreateTransactionDto,
   ): Promise<ApiResponse<AllTransaction>> {
     try {
@@ -36,7 +36,7 @@ export class AllTransactionRepository {
     }
   }
 
-  async findAllTransactions(): Promise<ApiResponse<AllTransaction[]>> {
+  async findAll(): Promise<ApiResponse<AllTransaction[]>> {
     try {
       const transactions = await this.transactionModel.find().exec();
       return {
@@ -55,7 +55,7 @@ export class AllTransactionRepository {
     }
   }
 
-  async findTransactionById(id: string): Promise<ApiResponse<AllTransaction>> {
+  async find(id: string): Promise<ApiResponse<AllTransaction>> {
     try {
       const transaction = await this.transactionModel.findById(id).exec();
       if (!transaction) {
@@ -82,12 +82,14 @@ export class AllTransactionRepository {
     }
   }
 
-  async updateTransaction(
+  async update(
     id: string,
-    updateTransactionDto: Partial<UpdateTransactionDto>,
+    updateTransactionDto: UpdateTransactionDto,
   ): Promise<ApiResponse<AllTransaction>> {
     try {
-      const updatedTransaction = await this.transactionModel.findByIdAndUpdate(id, updateTransactionDto, { new: true }).exec();
+      const updatedTransaction = await this.transactionModel
+        .findByIdAndUpdate(id, updateTransactionDto, { new: true })
+        .exec();
       if (!updatedTransaction) {
         return {
           statusCode: 404,
@@ -112,7 +114,7 @@ export class AllTransactionRepository {
     }
   }
 
-  async deleteTransaction(id: string): Promise<ApiResponse<null>> {
+  async delete(id: string): Promise<ApiResponse<null>> {
     try {
       const deletedTransaction = await this.transactionModel
         .findByIdAndDelete(id)

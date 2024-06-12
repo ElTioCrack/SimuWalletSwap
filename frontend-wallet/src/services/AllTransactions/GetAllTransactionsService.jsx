@@ -1,6 +1,6 @@
 import axios from "axios";
-import ApiResponse from "../models/ApiResponse";
-import BaseUrl from "./ApiConfig";
+import ApiResponse from "./../../models/ApiResponse";
+import BaseUrl from "./../ApiConfig";
 
 const GetAllTransactionsService = async () => {
   try {

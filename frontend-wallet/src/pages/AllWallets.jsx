@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import NavBar from "../components/NavBar";
-import GetPublicWalletsService from "../services/GetPublicWalletsService";
+import GetPublicWalletsService from "../services/wallet/GetPublicWalletsService";
 
 function AllWallets() {
   const [wallets, setWallets] = useState([]);
@@ -44,7 +44,6 @@ function AllWallets() {
 
   return (
     <>
-      <NavBar />
       <main className="container mx-auto px-4 py-8 min-h-screen">
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-semibold mb-4">All Public Wallets</h2>

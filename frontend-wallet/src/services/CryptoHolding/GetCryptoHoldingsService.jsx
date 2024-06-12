@@ -1,6 +1,6 @@
-import ApiResponse from "../models/ApiResponse";
-import BaseUrl from "./ApiConfig";
 import axios from "axios";
+import ApiResponse from "./../../models/ApiResponse";
+import BaseUrl from "./../ApiConfig";
 
 const GetCryptoHoldingsService = async (publicKey) => {
   try {

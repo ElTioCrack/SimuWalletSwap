@@ -31,6 +31,11 @@ export class UpdateTransactionDto {
   @IsString()
   @ApiProperty({ description: 'Token of the transaction', required: false })
   token?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @ApiProperty({ description: 'Commission of the transaction' })
+  commission?: number;
 }
 
 

@@ -1,6 +1,5 @@
 import React, { useContext, createContext, useState, useEffect } from "react";
 import {
-  fetchWalletInfo,
   verifyAccessToken,
   verifyRefreshToken,
   generateAccessTokenFromRefreshToken,

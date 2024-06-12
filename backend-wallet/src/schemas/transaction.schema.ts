@@ -10,7 +10,7 @@ enum TransactionType {
 @Schema()
 class Transaction {
   @Prop({ enum: Object.values(TransactionType), required: true })
-  type: TransactionType | string;
+  type: TransactionType;
 
   @Prop({ required: true })
   token: string;
@@ -23,6 +23,9 @@ class Transaction {
 
   @Prop({ required: true })
   timestamp: string;
+
+  @Prop({ required: false })
+  allTransactionId?: string;
 }
 
 const TransactionSchema = SchemaFactory.createForClass(Transaction);
